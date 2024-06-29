@@ -1,20 +1,22 @@
-*,
-*::before,
-*::after {
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 body {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
   background-color: #f4f4f4;
   color: #333;
   line-height: 1.6;
   padding: 20px;
 }
 a {
-  color: #333;
+  color: #0779e4;
   text-decoration: none;
+  transition: color 0.3s ease-in-out;
+}
+a:hover {
+  color: #034078;
 }
 header {
   background: #333;
@@ -29,6 +31,8 @@ header h1 {
 }
 .form-group {
   margin: 20px 0;
+  display: grid;
+  gap: 10px;
 }
 .form-group label {
   display: block;
@@ -40,26 +44,32 @@ header h1 {
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: border-color 0.25s ease-in-out;
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #0779e4;
 }
 .form-group button {
   width: 100%;
-  background: #333;
+  background: #0779e4;
   color: #fff;
   padding: 10px;
   border: 0;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.25s ease-in-out;
 }
 .form-group button:hover {
-  background: #555;
+  background: #034078;
 }
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
 }
-table th,
-table td {
+table th, table td {
   padding: 10px;
   border: 1px solid #ccc;
   text-align: left;
@@ -75,7 +85,7 @@ table th {
   .form-group input,
   .form-group textarea,
   .form-group button {
-    width: auto;
+    width: 100%;
     margin: 0;
   }
 }
