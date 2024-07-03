@@ -1,5 +1,8 @@
-const Migrations = artifacts.require("Migrations");
+// Importing the necessary artifact for the migration
+const MigrationsContract = artifacts.require("Migrations");
 
-module.exports = function(deployer) {
-  deployer.deploy(Migrations);
+// This module exports a function that deploys the Migrations contract
+module.exports = function(deployContract) {
+  // Deploying the Migrations contract
+  deployContract.deploy(MigrationsContract);
 };
