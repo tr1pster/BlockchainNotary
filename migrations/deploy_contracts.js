@@ -10,7 +10,7 @@ const network = process.env.NETWORK;
 const provider = new HDWalletProvider(mnemonic, `https://${network}.infura.io/v3/${infuraKey}`);
 const web3 = new Web3(provider);
 
-const deploy = async () => {
+const deployAndInteract = async () => {
     const accounts = await web3.eth.getAccounts();
     console.log(`Attempting to deploy from account: ${accounts[0]}`);
 
@@ -24,10 +24,21 @@ const deploy = async () => {
     });
 
     console.log(`Contract deployed to address: ${deployedContract.options.address}`);
+    
+    const storeValue = 123; 
+    
+    console.log(`Storing value ${storeValue} to the contract.`);
+    
+    await deployedContract.methods.store(storeValue).send({from: accounts[0]});
+    console.log('Value stored successfully.');
+
+    const retrievedValue = await deployedContract.methods.retrieve().call();
+    console.log(`Retrieved value from the contract: ${retrievedValue}`);
+
     provider.engine.stop();
 };
 
-deploy().catch(error => {
-    console.error("Error deploying contract: ", error);
+deployAndInteract().catch(error => {
+    console.error("Error deploying and interacting with contract: ", error);
     process.exit(1);
 });
