@@ -1,62 +1,61 @@
-// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
 contract BlockchainNotary {
-    struct Document {
-        uint256 timestamp;
-        address owner;
-        bool isSigned;
+    struct DocumentRecord {
+        uint256 creationTimestamp;
+        address documentOwner;
+        bool hasBeenSigned;
     }
 
-    mapping(bytes32 => Document) private documents;
+    mapping(bytes32 => DocumentRecord) private documentRecords;
 
-    event DocumentRegistered(bytes32 docHash, address owner, uint256 timestamp);
-    event DocumentSigned(bytes32 docHash, address signer);
+    event DocumentRegistering(bytes32 documentHash, address registrant, uint256 timestamp);
+    event DocumentSigning(bytes32 documentHash, address signer);
 
-    function registerDocument(bytes32 docHash) external {
-        requireDocumentNotRegistered(docHash);
-        _registerDocument(docHash);
+    function registerDocument(bytes32 documentHash) external {
+        validateDocumentUnregistered(documentHash);
+        addDocumentRecord(documentHash);
     }
 
-    function signDocument(bytes32 docHash) external {
-        requireDocumentRegistered(docHash);
-        requireDocumentOwner(docHash);
-        requireDocumentNotSigned(docHash);
-        _signDocument(docHash);
+    function signDocument(bytes32 documentHash) external {
+        validateDocumentExists(documentHash);
+        validateDocumentOwnership(documentHash);
+        validateDocumentUnsigned(documentHash);
+        markDocumentAsSigned(documentHash);
     }
 
-    function verifyDocument(bytes32 docHash) external view returns (bool exists, bool isSigned, address owner) {
-        if (documents[docHash].timestamp == 0) {
+    function verifyDocument(bytes32 documentHash) external view returns (bool exists, bool signed, address owner) {
+        if (documentRecords[documentHash].creationTimestamp == 0) {
             return (false, false, address(0));
         } else {
-            Document memory doc = documents[docHash];
-            return (true, doc.isSigned, doc.owner);
+            DocumentRecord memory document = documentRecords[documentHash];
+            return (true, document.hasBeenSigned, document.documentOwner);
         }
     }
 
-    function requireDocumentNotRegistered(bytes32 docHash) private view {
-        require(documents[docHash].timestamp == 0, "Document already registered.");
+    function validateDocumentUnregistered(bytes32 documentHash) private view {
+        require(documentRecords[documentHash].creationTimestamp == 0, "Document already registered.");
     }
 
-    function requireDocumentRegistered(bytes32 docHash) private view {
-        require(documents[docHash].timestamp != 0, "Document not registered.");
+    function validateDocumentExists(bytes32 documentHash) private view {
+        require(documentRecords[documentHash].creationTimestamp != 0, "Document not registered.");
     }
 
-    function requireDocumentOwner(bytes32 docHash) private view {
-        require(documents[docHash].owner == msg.sender, "Only the document owner can sign the document.");
+    function validateDocumentOwnership(bytes32 documentHash) private view {
+        require(documentRecords[documentHash].documentOwner == msg.sender, "Only document owner can sign.");
     }
 
-    function requireDocumentNotSigned(bytes32 docHash) private view {
-        require(!documents[docHash].isSigned, "Document is already signed.");
+    function validateDocumentUnsigned(bytes32 documentHash) private view {
+        require(!documentRecords[documentHash].hasBeenSigned, "Document already signed.");
     }
 
-    function _registerDocument(bytes32 docHash) private {
-        documents[docHash] = Document({timestamp: block.timestamp, owner: msg.sender, isSigned: false});
-        emit DocumentRegistered(docHash, msg.sender, block.timestamp);
+    function addDocumentRecord(bytes32 documentHash) private {
+        documentRecords[documentHash] = DocumentRecord({creationTimestamp: block.timestamp, documentOwner: msg.sender, hasBeenSigned: false});
+        emit DocumentRegistering(documentHash, msg.sender, block.timestamp);
     }
 
-    function _signDocument(bytes32 docHash) private {
-        documents[docHash].isSigned = true;
-        emit DocumentSigned(docHash, msg.sender);
+    function markDocumentAsSigned(bytes32 documentHash) private {
+        documentRecords[documentHash].hasBeenSigned = true;
+        emit DocumentSigning(documentHash, msg.sender);
     }
 }
