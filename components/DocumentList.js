@@ -5,24 +5,24 @@ const DocumentListComponent = () => {
   const [documents, setDocuments] = useState([]);
 
   useEffect(() => {
-    fetchDocuments();
+    retrieveDocuments();
   }, []);
 
-  const fetchDocuments = async () => {
+  const retrieveDocuments = async () => {
     try {
       const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/documents`);
       setDocuments(response.data);
     } catch (error) {
-      console.error('Error fetching documents:', error);
+      console.error('Error retrieving documents:', error);
     }
   };
 
-  const viewDocument = (documentId) => {
-    console.log(`Viewing document with id: ${documentId}`);
+  const handleViewDocument = (documentId) => {
+    console.log(`Viewing document ID: ${documentId}`);
   };
 
-  const signDocument = (documentId) => {
-    console.log(`Signing document with id: ${documentId}`);
+  const handleSignDocument = (documentId) => {
+    console.log(`Signing document ID: ${documentId}`);
   };
 
   return (
@@ -30,14 +30,14 @@ const DocumentListComponent = () => {
       <h2>Registered Documents</h2>
       {documents.length > 0 ? (
         <ul>
-          {documents.map((doc) => (
-            <li key={doc.id}>
+          {documents.map((document) => (
+            <li key={document.id}>
               <div>
-                <strong>{doc.title}</strong> by {doc.author} ({new Date(doc.timestamp).toLocaleString()})
+                <strong>{document.title}</strong> by {document.author} ({new Date(document.timestamp).toLocaleString()})
               </div>
               <div>
-                <button onClick={() => viewDocument(doc.id)}>View</button>
-                <button onClick={() => signDocument(doc.id)}>Sign</button>
+                <button onClick={() => handleViewDocument(document.id)}>View</button>
+                <button onClick={() => handleSignDocument(document.id)}>Sign</button>
               </div>
             </li>
           ))}
