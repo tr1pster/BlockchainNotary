@@ -1,13 +1,20 @@
 import React, { useState, useEffect } from 'react';
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
+const cache = {};
+
 const DocumentDetailComponent = ({ selectedDocumentId }) => {
   const [documentDetails, setDocumentDetails] = useState(null);
 
   const fetchDocumentDetails = async () => {
+    if (cache[selectedDocumentId]) {
+      setDocumentDetails(cache[selectedDocumentId]);
+      return;
+    }
     try {
       const response = await fetch(`${API_BASE_URL}/documents/${selectedDocumentId}`);
       const data = await response.json();
+      cache[selectedDocumentId] = data;
       setDocumentDetails(data);
     } catch (error) {
       console.error('Failed to fetch document details:', error);
@@ -19,6 +26,7 @@ const DocumentDetailComponent = ({ selectedDocumentId }) => {
       const response = await fetch(`${API_BASE_URL}/documents/sign/${selectedDocumentId}`, { method: 'POST' });
       const result = await response.json();
       alert(result.message);
+      delete cache[selectedDocumentId];
       fetchDocumentDetails();
     } catch (error) {
       console.error('Failed to sign the document:', error);
