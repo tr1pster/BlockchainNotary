@@ -21,16 +21,17 @@ const DocumentDetailComponent = ({ selectedDocumentId }) => {
     }
   };
 
-  const signDocument = async () => {
+  const signAndFetchDetails = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/documents/sign/${selectedDocumentId}`, { method: 'POST' });
       const result = await response.json();
       alert(result.message);
-      delete cache[selectedDocumentId];
-      fetchDocumentDetails();
+      delete cache[selectedDocumentId]; // Invalidate cache to force re-fetching updated details
     } catch (error) {
       console.error('Failed to sign the document:', error);
+      return; // Early return on error to avoid redundant fetch
     }
+    await fetchDocumentDetails(); // Re-fetch details only after successful sign
   };
 
   const verifyDocument = async () => {
@@ -59,7 +60,7 @@ const DocumentDetailComponent = ({ selectedDocumentId }) => {
           <p><b>Status:</b> {documentDetails.status}</p>
           <p><b>Hash:</b> {documentDetails.hash}</p>
           <p><b>Signees:</b> {documentDetails.signees.join(', ')}</p>
-          <button onClick={signDocument}>Sign Document</button>
+          <button onClick={signAndFetchDetails}>Sign Document</button>
           <button onClick={verifyDocument}>Verify Document</button>
         </div>
       ) : (
